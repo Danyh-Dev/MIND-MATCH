@@ -1,48 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package javaapplication12;
 
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.net.Socket;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.net.URL;
 import java.io.File;
 
-/**
- *
- * @author ASUS
- */
-public class NewJFrame1 extends javax.swing.JFrame {
-
-    private Timer imageTimer; // Timer for hiding image
-    private Timer answerTimer; // Timer for answer submission
+public class NewJFrame2 extends javax.swing.JFrame {
+    private Timer imageTimer;
+    private Timer answerTimer;
     private int imageTimeLeft = 15; // 15 seconds for image viewing
     private int answerTimeLeft = 15; // 15 seconds for answering
     private JPanel questionPanel;
-    private JRadioButton option1, option2, option3;
-    private ButtonGroup optionsGroup;
-    private JLabel questionLabel;
+    private JRadioButton jRadioButton1, jRadioButton2, jRadioButton3;
+    private ButtonGroup buttonGroup1;
+    private JLabel jLabel1, jLabel2, jLabel3;
+    private JButton jButton1;
     private JLabel timerLabel;
-    private ScorePanel scorePanel;
-    private static final String CORRECT_ANSWER = "1";
-    private Socket socket;
+    private ScorePanel scorePanel; 
     private PrintWriter out;
+    private Socket socket;
     private BufferedReader in;
     private boolean answerSubmitted = false;
     private int playerScore = 0;
-
-    /**
-     * Creates new form NewJFrame1
-     */
-    public NewJFrame1(Socket socket, PrintWriter out, BufferedReader in) {
+    
+    // Correct answer is option 1 (jRadioButton1)
+    private static final String CORRECT_ANSWER = "1";
+    
+    public NewJFrame2(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
         this.out = out;
         this.in = in;
@@ -56,12 +46,61 @@ public class NewJFrame1 extends javax.swing.JFrame {
         scorePanel = new ScorePanel();
         
         initComponents();
+        setupUI();
         startImageTimer();
         hideQuestionAndOptions();
         startMessageListener();
         
         // Request initial scores
         out.println("GET_SCORES");
+    }
+
+    private void setupUI() {
+        // Apply theme to frame
+        QuizTheme.styleFrame(this);
+        
+        // Style components
+        QuizTheme.styleButton(jButton1);
+        QuizTheme.styleRadioButton(jRadioButton1);
+        QuizTheme.styleRadioButton(jRadioButton2);
+        QuizTheme.styleRadioButton(jRadioButton3);
+        
+        // Load the image
+        try {
+            String imagePath = "src/images/DESIGNERS.jpg";
+            File imageFile = new File(imagePath);
+            if (imageFile.exists()) {
+                ImageIcon icon = new ImageIcon(imagePath);
+                Image img = icon.getImage();
+                Image newImg = img.getScaledInstance(400, 300, Image.SCALE_SMOOTH);
+                jLabel1.setIcon(new ImageIcon(newImg));
+            } else {
+                System.err.println("Image not found at: " + imagePath);
+                jLabel1.setText("Image not found");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading image: " + e.getMessage());
+            jLabel1.setText("Error loading image");
+            e.printStackTrace();
+        }
+    }
+
+    private void startMessageListener() {
+        new Thread(() -> {
+            try {
+                String message;
+                while ((message = in.readLine()) != null) {
+                    if (message.startsWith("SCORES:")) {
+                        final String scoreData = message;
+                        SwingUtilities.invokeLater(() -> {
+                            scorePanel.updateScores(scoreData);
+                        });
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     /**
@@ -72,7 +111,7 @@ public class NewJFrame1 extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup1 = new ButtonGroup();
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -101,20 +140,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
         imagePanel.setBorder(BorderFactory.createLineBorder(new Color(255, 140, 0), 2)); // Orange border
         imagePanel.setBackground(new Color(255, 240, 245)); // Light pink background
         jLabel1 = new javax.swing.JLabel();
-        try {
-            ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/HOWMANY.png"));
-            if (icon.getImage() == null) {
-                jLabel1.setText("Image not available");
-                jLabel1.setFont(new Font("Segoe UI", Font.BOLD, 24));
-            } else {
-                Image img = icon.getImage();
-                Image scaledImg = img.getScaledInstance(800, 600, Image.SCALE_SMOOTH);
-                jLabel1.setIcon(new ImageIcon(scaledImg));
-            }
-        } catch (Exception e) {
-            jLabel1.setText("Error loading image");
-            jLabel1.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        }
         jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         imagePanel.add(jLabel1, BorderLayout.CENTER);
         
@@ -124,21 +149,19 @@ public class NewJFrame1 extends javax.swing.JFrame {
         questionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         questionPanel.setBackground(new Color(255, 228, 225)); // Misty rose background
         
-        jLabel3 = new javax.swing.JLabel("How many fruits were on the picture?");
+        jLabel3 = new javax.swing.JLabel("What were the colors of the mugs?");
         jLabel3.setFont(new Font("Segoe UI", Font.BOLD, 18));
         jLabel3.setForeground(new Color(139, 69, 19)); // Brown text
         jLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Create radio buttons
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jRadioButton1 = new javax.swing.JRadioButton("8 fruits");
-        jRadioButton2 = new javax.swing.JRadioButton("6 fruits");
-        jRadioButton3 = new javax.swing.JRadioButton("10 fruits");
+        jRadioButton1 = new javax.swing.JRadioButton("Black and Yellow");
+        jRadioButton2 = new javax.swing.JRadioButton("Red and Blue");
+        jRadioButton3 = new javax.swing.JRadioButton("White and Green");
         
         // Style radio buttons
         Font optionFont = new Font("Segoe UI", Font.PLAIN, 16);
-        Color radioBtnColor = new Color(255, 140, 0); // Orange
-        
         for (JRadioButton btn : new JRadioButton[]{jRadioButton1, jRadioButton2, jRadioButton3}) {
             btn.setFont(optionFont);
             btn.setForeground(new Color(139, 69, 19)); // Brown text
@@ -175,104 +198,29 @@ public class NewJFrame1 extends javax.swing.JFrame {
         
         // Set frame properties
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Quiz Game - Round 1");
+        setTitle("Quiz Game - Round 2");
         setPreferredSize(new Dimension(800, 800));
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainPanel, BorderLayout.CENTER);
         getContentPane().setBackground(new Color(255, 240, 245)); // Light pink background
         pack();
         setLocationRelativeTo(null);
-        
-        setupUI();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void setupUI() {
-        // Apply theme to frame
-        QuizTheme.styleFrame(this);
-        
-        // Style the buttons
-        QuizTheme.styleButton(jButton1);
-        
-        // Style radio buttons
-        QuizTheme.styleRadioButton(jRadioButton1);
-        QuizTheme.styleRadioButton(jRadioButton2);
-        QuizTheme.styleRadioButton(jRadioButton3);
-        
-        // Style panels
-        for (Component comp : getContentPane().getComponents()) {
-            if (comp instanceof JPanel) {
-                QuizTheme.stylePanel((JPanel)comp);
-            }
-        }
-        
-        // Style labels
-        for (Component comp : getContentPane().getComponents()) {
-            if (comp instanceof JLabel) {
-                if (((JLabel)comp).getFont().getSize() > 16) {
-                    QuizTheme.styleTitleLabel((JLabel)comp);
-                } else {
-                    QuizTheme.styleLabel((JLabel)comp);
-                }
-            }
-        }
-        
-        // Load the image
-        try {
-            String imagePath = "/Users/mohammedalgumlas/Downloads/JavaApplication12 2/src/images/HOWMANY.png";
-            File imageFile = new File(imagePath);
-            if (imageFile.exists()) {
-                ImageIcon icon = new ImageIcon(imagePath);
-                Image img = icon.getImage();
-                Image newImg = img.getScaledInstance(400, 300, Image.SCALE_SMOOTH);
-                jLabel1.setIcon(new ImageIcon(newImg));
-            } else {
-                System.err.println("Image not found at: " + imagePath);
-                jLabel1.setText("Image not found");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading image: " + e.getMessage());
-            jLabel1.setText("Error loading image");
-            e.printStackTrace();
-        }
     }
+    // </editor-fold>//GEN-END:initComponents
 
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
-
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
-
-    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        checkAnswer();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    ;
-
-    /**
-     * Start the timer that will hide the image after 15 seconds.
-     */
     private void startImageTimer() {
         imageTimer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 imageTimeLeft--;
-                timerLabel.setText("Time left: " + imageTimeLeft + "s");
-                System.out.println("Image time left: " + imageTimeLeft); // Debug print
+                timerLabel.setText("Image time left: " + imageTimeLeft + "s");
                 
                 if (imageTimeLeft <= 0) {
                     imageTimer.stop();
+                    // Hide the image and show questions
                     jLabel1.setVisible(false);
-                    jLabel2.setText("Choose the correct option:");
-                    showQuestionAndOptions();
+                    jLabel2.setVisible(false);
+                    questionPanel.setVisible(true);
                     startAnswerTimer();
                 }
             }
@@ -281,35 +229,29 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }
 
     private void startAnswerTimer() {
-        answerTimeLeft = 15; // Reset to 15 seconds
-        System.out.println("Starting answer timer: " + answerTimeLeft + " seconds"); // Debug print
-        
+        timerLabel.setText("Answer time left: " + answerTimeLeft + "s");
         answerTimer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 answerTimeLeft--;
-                timerLabel.setText("Time to answer: " + answerTimeLeft);
-                System.out.println("Answer time left: " + answerTimeLeft); // Debug print
+                timerLabel.setText("Answer time left: " + answerTimeLeft + "s");
                 
                 if (answerTimeLeft <= 0) {
-                    System.out.println("Timer finished, moving to next frame"); // Debug print
                     answerTimer.stop();
                     
-                    // If no answer was submitted, send a default answer
+                    // If no answer was submitted, send default answer
                     if (!answerSubmitted) {
-                        System.out.println("No answer submitted, sending default"); // Debug print
+                        System.out.println("No answer submitted, sending default");
                         out.println("ANSWER:0");
                     }
                     
-                    // Create and show next frame
+                    // Move to NewJFrame3
                     SwingUtilities.invokeLater(() -> {
                         try {
-                            System.out.println("Creating NewJFrame2"); // Debug print
-                            NewJFrame2 nextFrame = new NewJFrame2(socket, out, in);
-                            nextFrame.setVisible(true);
-                            System.out.println("NewJFrame2 created and visible"); // Debug print
+                            System.out.println("Creating NewJFrame3");
+                            NewJFrame3 frame3 = new NewJFrame3(socket, out, in);
+                            frame3.setVisible(true);
                             dispose();
-                            System.out.println("NewJFrame1 disposed"); // Debug print
                         } catch (Exception ex) {
                             System.err.println("Error creating next frame: " + ex.getMessage());
                             ex.printStackTrace();
@@ -321,25 +263,20 @@ public class NewJFrame1 extends javax.swing.JFrame {
         answerTimer.start();
     }
 
-    // Hide the question and radio buttons initially.
+    private void jButton1ActionPerformed(ActionEvent evt) {
+        if (!answerSubmitted) {
+            checkAnswer();
+            answerSubmitted = true;
+            // Disable the submit button after submission
+            jButton1.setEnabled(false);
+        }
+    }
+
     private void hideQuestionAndOptions() {
-        jLabel3.setVisible(false); // Hide the question label
-        jRadioButton1.setVisible(false); // Hide radio button 1
-        jRadioButton2.setVisible(false); // Hide radio button 2
-        jRadioButton3.setVisible(false); // Hide radio button 3
-        jButton1.setVisible(false); // Hide submit button initially
+        // Initially hide the question panel
+        questionPanel.setVisible(false);
     }
 
-    // Show the question and radio buttons after the image has been hidden
-    private void showQuestionAndOptions() {
-        jLabel3.setVisible(true);
-        jRadioButton1.setVisible(true);
-        jRadioButton2.setVisible(true);
-        jRadioButton3.setVisible(true);
-        jButton1.setVisible(true);
-    }
-
-    // Check the selected answer
     private void checkAnswer() {
         if (!answerSubmitted) {
             String selectedOption = getSelectedAnswer();
@@ -357,32 +294,17 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }
 
     private String getSelectedAnswer() {
-        if (jRadioButton1.isSelected()) {
-            return "1";
-        } else if (jRadioButton2.isSelected()) {
-            return "2";
-        } else if (jRadioButton3.isSelected()) {
-            return "3";
-        }
-        return "";
-    }
+        String selectedOption = "";
 
-    private void startMessageListener() {
-        new Thread(() -> {
-            try {
-                String message;
-                while ((message = in.readLine()) != null) {
-                    if (message.startsWith("SCORES:")) {
-                        final String scoreData = message;
-                        SwingUtilities.invokeLater(() -> {
-                            scorePanel.updateScores(scoreData);
-                        });
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        if (jRadioButton1.isSelected()) {
+            selectedOption = "1";
+        } else if (jRadioButton2.isSelected()) {
+            selectedOption = "2";
+        } else if (jRadioButton3.isSelected()) {
+            selectedOption = "3";
+        }
+
+        return selectedOption;
     }
 
     public static void main(String args[]) {
@@ -399,32 +321,25 @@ public class NewJFrame1 extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewJFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new NewJFrame1().setVisible(true);
+                //new NewJFrame2(0, 0, true).setVisible(true);
             }
         });
+         //SwingUtilities.invokeLater(() -> new NewJFrame2(0, 0, true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
     // End of variables declaration//GEN-END:variables
 }
