@@ -1,0 +1,17 @@
+Question: How many pieces of fruit are on the kitchen counter?
+
+Options:
+1) 3 pieces (Correct)
+2) 4 pieces
+3) 2 pieces
+4) 5 pieces
+
+Items to look for:
+- Red apple
+- Orange
+- Banana
+- Blue coffee mug
+- Silver kettle
+- White plate
+- Wooden cutting board
+- Two spoons

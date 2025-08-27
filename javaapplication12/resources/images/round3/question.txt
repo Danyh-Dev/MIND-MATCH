@@ -1,0 +1,18 @@
+Question: How many blue triangles are in the pattern?
+
+Options:
+1) 4 triangles (Correct)
+2) 3 triangles
+3) 5 triangles
+4) 2 triangles
+
+Pattern elements:
+- 4x4 grid layout
+- Blue triangles (4)
+- Red circles (3)
+- Green squares (3)
+- Yellow diamonds (2)
+- Different sizes
+- Some overlapping shapes
+- Specific color pattern
+- Varied orientations
